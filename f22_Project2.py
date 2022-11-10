@@ -1,3 +1,7 @@
+#Name: Emily Vanek
+#Student ID: 
+#email: evanek@umich.edu
+#Collaborators: Jesse Goodman, Jack Basner 
 from xml.sax import parseString
 from bs4 import BeautifulSoup
 import re
@@ -25,7 +29,22 @@ def get_listings_from_search_results(html_file):
         ('Loft in Mission District', 210, '1944564'),  # example
     ]
     """
-    pass
+    with open (html_file) as f:
+        soup = BeautifulSoup(f, "html.parser")
+    title_tags = soup.find_all('div', class_ = 't1jojoys dir dir-ltr')
+    titles = []
+    ids = []
+    for t in title_tags:
+        titles.append(t.text)
+        ids.append(t.get('id').split('_')[1])
+    price_tags = soup.find_all('span', class_="_tyxjp1")
+    prices = []
+    for p in price_tags:
+        prices.append(int(p.text[1:]))
+    listings = []
+    for i in range(len(titles)):
+        listings.append((titles[i], prices[i], ids[i]))
+    return listings
 
 
 def get_listing_information(listing_id):
@@ -147,11 +166,12 @@ class TestCases(unittest.TestCase):
         # check that the variable you saved after calling the function is a list
         self.assertEqual(type(listings), list)
         # check that each item in the list is a tuple
-
+        for i in range(len(listings)):
+            self.assertEqual(type(listings[i]), tuple)
         # check that the first title, cost, and listing id tuple is correct (open the search results html and find it)
-
+        self.assertEqual(listings[0], ("Loft in Mission District", 210, "1944564"))
         # check that the last title is correct (open the search results html and find it)
-        pass
+        self.assertEqual(listings[-1][0], "Guest suite in Mission District")
 
     def test_get_listing_information(self):
         html_list = ["1623609",
