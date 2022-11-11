@@ -71,7 +71,32 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
-    pass
+    file_name = f"listing_{listing_id}.html"
+    with open(file_name) as f:
+        soup = BeautifulSoup(f, 'html.parser')
+    
+    policy_tag = soup.find('div', class_= '_1k8vduze')
+    policy_number = policy_tag.find('span').text
+
+    description = soup.find('h2', class_ = '_14i3z6h').text
+    if 'private' in description or 'Private' in description:
+        place_type = 'Private Room'
+    elif 'shared' in description or 'Shared' in description:
+        place_type = 'Shared Room'
+    else:
+        place_type = "Entire Room"
+    
+    bedrooms_text = soup.find_all('li', class_ = 'l7n4lsf dir dir-ltr')[1].find_all('span')[2].text
+    if 'Studio' in bedrooms_text or 'studio' in bedrooms_text:
+        bedrooms = 1
+    else:
+        bedrooms = int(bedrooms_text[0])
+    
+    return (
+        policy_number,
+        place_type,
+        bedrooms
+    )
 
 
 def get_detailed_listing_database(html_file):
